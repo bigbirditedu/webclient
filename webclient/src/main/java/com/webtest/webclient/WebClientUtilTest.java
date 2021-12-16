@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 /**
@@ -168,9 +170,13 @@ public class WebClientUtilTest {
         System.out.println("https done");
     }
 
+    /**
+     * 以同步阻塞方式使用webclient
+     * @return
+     */
     @GetMapping("/blockgetlist")
     public String testBlockGetListTomcat() {
-        //同步阻塞式处理返回多个对象响应结果(List),可以在tomcat服务器环境下使用
+        //同步阻塞式处理返回多个对象响应结果(List)
         //本接口可用于压测 调试
         long start = System.currentTimeMillis();
         Mono<ResponseEntity<String>> response = webClientUtil.get("http://127.0.0.1:8081/products", null, null);
@@ -180,4 +186,28 @@ public class WebClientUtilTest {
         return block.getBody();
     }
 
+    /**
+     * 以CompletableFuture方式使用webclient
+     * @return
+     */
+    @GetMapping("webcfuture")
+    public List<Product> webcFuture() {
+        CompletableFuture<ResponseEntity<String>> products = get4Products();//发送http请求
+        List<Product> productList = new ArrayList<>();
+        try {
+            ResponseEntity<String> res = products.get();//最终需要数据的地方才发起阻塞调用
+            productList = JSON.parseArray(res.getBody(), Product.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return productList;
+    }
+
+    public CompletableFuture<ResponseEntity<String>> get4Products() {
+        long start = System.currentTimeMillis();
+        CompletableFuture<ResponseEntity<String>> future = webClientUtil.getForFuture("http://127.0.0.1:8081/products", null, null);
+        long end = System.currentTimeMillis();
+        System.out.println(Thread.currentThread().getName() + " webclient future cost:" + (end - start));
+        return future;
+    }
 }

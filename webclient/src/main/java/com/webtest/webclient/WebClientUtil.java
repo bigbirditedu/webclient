@@ -104,9 +104,9 @@ public class WebClientUtil {
 
     /**
      * 普通get请求
-     *
      * @param uri
      * @param headers
+     * @param mediaType
      * @return
      */
     public Mono<ResponseEntity<String>> get(String uri, Map<String, String> headers, MediaType mediaType) {
@@ -115,9 +115,9 @@ public class WebClientUtil {
 
     /**
      * 普通post请求
-     *
      * @param uri
      * @param headers
+     * @param mediaType
      * @param bodyValue
      * @return
      */
