@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -31,6 +32,12 @@ public class PooledRestTemplateClient {
         //factory.setReadTimeout(6000);
         factory.setConnectionRequestTimeout(6000);
         restTemplate = new RestTemplate(factory);
+        //可以给restTemplate加拦截器，比如对出去的http请求统一加上唯一追踪标识
+        restTemplate.setInterceptors(Collections.singletonList(restTemplateInterceptor()));
+    }
+
+    public RestTemplateInterceptor restTemplateInterceptor() {
+        return new RestTemplateInterceptor();
     }
 
     @GetMapping("pooledrest")

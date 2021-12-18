@@ -49,8 +49,12 @@ public class HttpServerController {
     }
 
     @RequestMapping("products")
-    public List<Product> getAllProducts(String type) throws InterruptedException {
+    public List<Product> getAllProducts(String type, HttpServletRequest request) throws InterruptedException {
         long start = System.currentTimeMillis();
+        //输出请求头
+        String traceId = request.getHeader("traceId");
+        System.out.println("traceId:" + traceId);
+
         List<Product> products = new ArrayList<>();
         products.add(new Product(type + "A", "1", 56.67));
         products.add(new Product(type + "B", "2", 66.66));
